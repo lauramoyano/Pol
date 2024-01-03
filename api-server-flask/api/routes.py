@@ -7,7 +7,7 @@ from datetime import datetime, timezone, timedelta
 
 from functools import wraps
 
-from flask import request
+from flask import jsonify, request
 from flask_restx import Api, Resource, fields
 
 import jwt
@@ -77,6 +77,18 @@ def token_required(f):
         return f(current_user, *args, **kwargs)
 
     return decorator
+
+"""
+        polarization measurement 
+"""
+@staticmethod
+def polarizationER(bins, K, alpha, distance):
+        sum = 0.0
+        for i, pi in enumerate(bins):
+            for j, pj in enumerate(bins):
+                sum += pow(pi, 1 + alpha) * pj * distance * abs(i - j)
+            return K * sum
+        return K * sum
 
 
 """
@@ -240,3 +252,5 @@ class GitHubLogin(Resource):
                     "username": user_json['username'],
                     "token": token,
                 }}, 200
+
+

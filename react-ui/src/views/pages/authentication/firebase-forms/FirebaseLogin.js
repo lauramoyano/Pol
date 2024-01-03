@@ -12,6 +12,7 @@ import {
     FormControl,
     FormControlLabel,
     FormHelperText,
+    FormLabel,
     Grid,
     IconButton,
     InputAdornment,
@@ -34,6 +35,8 @@ import AnimateButton from '../../../../ui-component/extended/AnimateButton';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import Google from './../../../../assets/images/icons/social-google.svg';
+import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
+import { useState } from 'react';
 
 // style constant
 const useStyles = makeStyles((theme) => ({
@@ -78,10 +81,12 @@ const useStyles = makeStyles((theme) => ({
 
 const FirebaseLogin = (props, { ...others }) => {
     const classes = useStyles();
+    const history = useHistory();
 
     const customization = useSelector((state) => state.customization);
     const scriptedRef = useScriptRef();
     const [checked, setChecked] = React.useState(true);
+    const [errorMessage, setErrorMessage] = useState('');
 
     const googleHandler = async () => {
         console.error('Login');
@@ -95,6 +100,7 @@ const FirebaseLogin = (props, { ...others }) => {
     const handleMouseDownPassword = (event) => {
         event.preventDefault();
     };
+   
 
     return (
         <React.Fragment>
@@ -148,8 +154,8 @@ const FirebaseLogin = (props, { ...others }) => {
 
             <Formik
                 initialValues={{
-                    email: 'info@codedthemes.com',
-                    password: '123456',
+                    email: '',
+                    password: '',
                     submit: null
                 }}
                 validationSchema={Yup.object().shape({
@@ -158,15 +164,20 @@ const FirebaseLogin = (props, { ...others }) => {
                 })}
                 onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
                     axios
-                        .post('https://api-server-nodejs.appseed.us/api/users/login', {
-                            firstName: 'Fred',
-                            lastName: 'Flintstone'
+                        .post('http://localhost:5001/api/users/login', {
+                            email: values.email,
+                            password: values.password
                         })
                         .then(function (response) {
+                            
                             console.log(response);
+                            if (response.status === 200) {
+                                history.push('/dashboard/default');
+                            }
                         })
                         .catch(function (error) {
                             console.log(error);
+                            setErrorMessage('Incorrect Credentials');
                         });
                     try {
                         if (scriptedRef.current) {
@@ -185,6 +196,14 @@ const FirebaseLogin = (props, { ...others }) => {
             >
                 {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
                     <form noValidate onSubmit={handleSubmit} {...others}>
+                          {errorMessage &&  
+                          <Box sx={{ color: 'red',  display: 'flex', justifyContent: 'center' }}>
+                            <FormLabel style={{ color: 'red', backgroundColor: '#ffe6e6', padding: '10px', borderRadius: '5px', marginTop: '10px' }}>
+                                {errorMessage}
+                            </FormLabel>
+                            </Box>
+                          }
+                      
                         <FormControl fullWidth error={Boolean(touched.email && errors.email)} className={classes.loginInput}>
                             <InputLabel htmlFor="outlined-adornment-email-login">Email Address / Username</InputLabel>
                             <OutlinedInput
@@ -194,7 +213,7 @@ const FirebaseLogin = (props, { ...others }) => {
                                 name="email"
                                 onBlur={handleBlur}
                                 onChange={handleChange}
-                                label="Email Address / Username"
+                                label="Email Address"
                                 inputProps={{
                                     classes: {
                                         notchedOutline: classes.notchedOutline
@@ -244,6 +263,7 @@ const FirebaseLogin = (props, { ...others }) => {
                                 </FormHelperText>
                             )}
                         </FormControl>
+                       
                         <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
                             <FormControlLabel
                                 control={

@@ -35,6 +35,9 @@ import { strengthColor, strengthIndicator } from '../../../../utils/password-str
 // assets
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
+import axios from 'axios';
+import { useState } from 'react';
+import { useHistory } from 'react-router-dom';
 
 // style constant
 const useStyles = makeStyles((theme) => ({
@@ -82,6 +85,8 @@ const FirebaseRegister = ({ ...others }) => {
     const scriptedRef = useScriptRef();
     const matchDownSM = useMediaQuery((theme) => theme.breakpoints.down('sm'));
     const customization = useSelector((state) => state.customization);
+    const [errorMessage, setErrorMessage] = useState('');
+    const history = useHistory();
     const [showPassword, setShowPassword] = React.useState(false);
     const [checked, setChecked] = React.useState(true);
 
@@ -163,8 +168,9 @@ const FirebaseRegister = ({ ...others }) => {
 
             <Formik
                 initialValues={{
-                    email: 'info@codedthemes.com',
-                    password: '123456',
+                    username: '',
+                    email: '',
+                    password: '',
                     submit: null
                 }}
                 validationSchema={Yup.object().shape({
@@ -173,12 +179,47 @@ const FirebaseRegister = ({ ...others }) => {
                 })}
                 onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
                     try {
+                        const response = await axios.post(
+                            'http://localhost:5001/api/users/register',
+                            {
+                                username: values.username,
+                                email: values.email,
+                                password: values.password
+                            },
+                            {
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                }
+                            }
+                        );
+
+                        console.log(response);
+                        if (response.status === 200) {
+                            history.push('/dashboard/default');
+                        }
+
                         if (scriptedRef.current) {
                             setStatus({ success: true });
                             setSubmitting(false);
                         }
                     } catch (err) {
                         console.error(err);
+                        if (err.response) {
+                            // El servidor respondió con un estado fuera del rango 2xx
+                            console.log(err.response.data);
+                            console.log(err.response.status);
+                            console.log(err.response.headers);
+                            setErrorMessage(err.response.data.message || 'Error al registrar');
+                        } else if (err.request) {
+                            // La petición se hizo pero no se recibió ninguna respuesta
+                            console.log(err.request);
+                            setErrorMessage('No se recibió ninguna respuesta del servidor');
+                        } else {
+                            // Algo sucedió en la configuración de la petición que provocó un error
+                            console.log('Error', err.message);
+                            setErrorMessage(err.message);
+                        }
+
                         if (scriptedRef.current) {
                             setStatus({ success: false });
                             setErrors({ submit: err.message });
@@ -189,30 +230,28 @@ const FirebaseRegister = ({ ...others }) => {
             >
                 {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
                     <form noValidate onSubmit={handleSubmit} {...others}>
-                        <Grid container spacing={matchDownSM ? 0 : 2}>
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    fullWidth
-                                    label="First Name"
-                                    margin="normal"
-                                    name="fname"
-                                    type="text"
-                                    defaultValue="Joseph"
-                                    className={classes.loginInput}
-                                />
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    fullWidth
-                                    label="Last Name"
-                                    margin="normal"
-                                    name="lname"
-                                    type="text"
-                                    defaultValue="Doe"
-                                    className={classes.loginInput}
-                                />
-                            </Grid>
-                        </Grid>
+                        <FormControl fullWidth error={Boolean(touched.username && errors.username)} className={classes.loginInput}>
+                            <InputLabel htmlFor="outlined-adornment-username-register">Username</InputLabel>
+                            <OutlinedInput
+                                id="outlined-adornment-username-register"
+                                type="text"
+                                value={values.username}
+                                name="username"
+                                onBlur={handleBlur}
+                                onChange={handleChange}
+                                inputProps={{
+                                    classes: {
+                                        notchedOutline: classes.notchedOutline
+                                    }
+                                }}
+                            />
+                            {touched.username && errors.username && (
+                                <FormHelperText error id="standard-weight-helper-text--register">
+                                    {' '}
+                                    {errors.username}{' '}
+                                </FormHelperText>
+                            )}
+                        </FormControl>
                         <FormControl fullWidth error={Boolean(touched.email && errors.email)} className={classes.loginInput}>
                             <InputLabel htmlFor="outlined-adornment-email-register">Email Address / Username</InputLabel>
                             <OutlinedInput
