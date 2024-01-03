@@ -17,9 +17,9 @@ import {
     InputAdornment,
     InputLabel,
     OutlinedInput,
-    TextField,
     Typography,
-    useMediaQuery
+    useMediaQuery,
+    FormLabel
 } from '@material-ui/core';
 
 // third party
@@ -38,6 +38,7 @@ import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import axios from 'axios';
 import { useState } from 'react';
 import { useHistory } from 'react-router-dom';
+
 
 // style constant
 const useStyles = makeStyles((theme) => ({
@@ -175,6 +176,7 @@ const FirebaseRegister = ({ ...others }) => {
                 }}
                 validationSchema={Yup.object().shape({
                     email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
+                    username: Yup.string().required('Username is required'),
                     password: Yup.string().max(255).required('Password is required')
                 })}
                 onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
@@ -209,11 +211,11 @@ const FirebaseRegister = ({ ...others }) => {
                             console.log(err.response.data);
                             console.log(err.response.status);
                             console.log(err.response.headers);
-                            setErrorMessage(err.response.data.message || 'Error al registrar');
+                            setErrorMessage(err.response.data.message || 'Faild to create user');
                         } else if (err.request) {
                             // La petición se hizo pero no se recibió ninguna respuesta
                             console.log(err.request);
-                            setErrorMessage('No se recibió ninguna respuesta del servidor');
+                            setErrorMessage('Doens\'t receive any response');
                         } else {
                             // Algo sucedió en la configuración de la petición que provocó un error
                             console.log('Error', err.message);
@@ -230,6 +232,14 @@ const FirebaseRegister = ({ ...others }) => {
             >
                 {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
                     <form noValidate onSubmit={handleSubmit} {...others}>
+
+                        {errorMessage &&  
+                            <Box sx={{ color: 'red',  display: 'flex', justifyContent: 'center' }}>
+                                <FormLabel style={{ color: 'red', backgroundColor: '#ffe6e6', padding: '10px', borderRadius: '5px', marginTop: '10px' }}>
+                                        {errorMessage}
+                                </FormLabel>
+                            </Box>
+                        }
                         <FormControl fullWidth error={Boolean(touched.username && errors.username)} className={classes.loginInput}>
                             <InputLabel htmlFor="outlined-adornment-username-register">Username</InputLabel>
                             <OutlinedInput
@@ -237,6 +247,7 @@ const FirebaseRegister = ({ ...others }) => {
                                 type="text"
                                 value={values.username}
                                 name="username"
+                                required
                                 onBlur={handleBlur}
                                 onChange={handleChange}
                                 inputProps={{
