@@ -1,13 +1,12 @@
 // assets
-import { IconBrandFramer, IconTypography, IconPalette, IconShadow, IconWindmill, IconLayoutGridAdd } from '@tabler/icons';
+import {  IconCheckbox,  IconChartBar, IconChartInfographic, IconLayoutGridAdd, IconDatabase } from '@tabler/icons';
 
 // constant
 const icons = {
-    IconTypography: IconTypography,
-    IconPalette: IconPalette,
-    IconShadow: IconShadow,
-    IconWindmill: IconWindmill,
-    IconBrandFramer: IconBrandFramer,
+    IconSurvey: IconCheckbox,
+    IconData: IconDatabase,
+    IconAxioms: IconChartBar,
+    IconMeasure: IconChartInfographic,
     IconLayoutGridAdd: IconLayoutGridAdd
 };
 
@@ -23,7 +22,7 @@ export const utilities = {
             title: 'Surveys',
             type: 'item',
             url: '/utils/surveys',
-            icon: icons['IconTypography'],
+            icon: icons['IconSurvey'],
             breadcrumbs: false
         },
         {
@@ -31,22 +30,22 @@ export const utilities = {
             title: 'Data',
             type: 'item',
             url: '/utils/data',
-            icon: icons['IconPalette'],
+            icon: icons['IconData'],
             breadcrumbs: false
         },
         {
-            id: 'util-analytics',
-            title: 'Analytics',
+            id: 'util-axioms',
+            title: 'Axioms',
             type: 'item',
-            url: '/utils/analytics',
-            icon: icons['IconShadow'],
+            url: '/utils/axioms',
+            icon: icons['IconAxioms'],
             breadcrumbs: false
         },
         {
             id: 'icons',
             title: 'Measures',
             type: 'collapse',
-            icon: icons['IconWindmill'],
+            icon: icons['IconMeasure'],
             children: [
                 {
                     id: 'E&R',

@@ -19,6 +19,8 @@ services:
     restart: always
     env_file: .env
     build: .
+    depends_on:
+      - db
     networks:
       - db_network
       - web_network

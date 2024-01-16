@@ -12,7 +12,7 @@ const DashboardDefault = Loadable(lazy(() => import('../views/dashboard/Default'
 // utilities routing
 const UtilsTypography = Loadable(lazy(() => import('../views/utilities/Surveys')));
 const UtilsColor = Loadable(lazy(() => import('../views/utilities/Data')));
-const UtilsShadow = Loadable(lazy(() => import('../views/utilities/Analytics')));
+const UtilsShadow = Loadable(lazy(() => import('../views/utilities/Axioms')));
 const UtilsERIcons = Loadable(lazy(() => import('../views/utilities/ER')));
 const UtilsCarlosIcons = Loadable(lazy(() => import('../views/utilities/Carlos')));
 const UtilsFrankIcons = Loadable(lazy(() => import('../views/utilities/Frank')));
@@ -33,7 +33,7 @@ const MainRoutes = () => {
 
                 '/utils/surveys',
                 '/utils/data',
-                '/utils/analytics',
+                '/utils/axioms',
                 '/icons/er-measure',
                 '/icons/frank-measure',
                 '/icons/carlos-measure',
@@ -49,7 +49,7 @@ const MainRoutes = () => {
 
                         <Route path="/utils/surveys" component={UtilsTypography} />
                         <Route path="/utils/data" component={UtilsColor} />
-                        <Route path="/utils/analytics" component={UtilsShadow} />
+                        <Route path="/utils/axioms" component={UtilsShadow} />
                         <Route path="/icons/er-measure" component={UtilsERIcons} />
                         <Route path="/icons/frank-measure" component={UtilsFrankIcons} />
                         <Route path="/icons/carlos-measure" component={UtilsCarlosIcons} />

@@ -12,10 +12,10 @@ from flask_restx import Api, Resource, fields
 
 import jwt
 
-from .models import db, Users, JWTTokenBlocklist
+from .models import db, Users, JWTTokenBlocklist, PolarizationCalculation, Measure
 from .config import BaseConfig
 import requests
-
+from .algorithms import ER, metric_experts, metric_comete, metric_mean, metric_median, metric_abs, metric_squared, metric_var
 rest_api = Api(version="1.0", title="Users API")
 
 
@@ -36,6 +36,10 @@ user_edit_model = rest_api.model('UserEditModel', {"userID": fields.String(requi
                                                    "username": fields.String(required=True, min_length=2, max_length=32),
                                                    "email": fields.String(required=True, min_length=4, max_length=64)
                                                    })
+
+data_model = rest_api.model('DataModel', {"bins": fields.List(fields.Integer, required=True),
+                                          "parameters": fields.List(fields.Float, required=True)
+                                          })
 
 
 """
@@ -81,14 +85,69 @@ def token_required(f):
 """
         polarization measurement 
 """
-@staticmethod
-def polarizationER(bins, K, alpha, distance):
-        sum = 0.0
-        for i, pi in enumerate(bins):
-            for j, pj in enumerate(bins):
-                sum += pow(pi, 1 + alpha) * pj * distance * abs(i - j)
-            return K * sum
-        return K * sum
+
+@rest_api.route('/api/users/polarizationer')
+class Measurement(Resource):
+    """
+       creates a new polarization measurement by taking 'data_model' input
+    """
+
+    @rest_api.expect(data_model, validate=True)
+    def post(self):
+    
+            req_data = request.get_json()
+            #current_user = Users.get_by_id(1).id
+            current_user = 1
+            namemeasure = "ER"
+            _bins = req_data.get("bins")
+            parameters = req_data.get("parameters")
+            _alpha = parameters[0]
+            
+            _new_polarization =  ER(alpha=_alpha, weights=_bins)
+            new_measure = Measure(user_id=current_user, measurename=namemeasure, 
+                                  measurement=_new_polarization, measuremedian=metric_median(_bins), 
+                                  measurevar=metric_var(_bins), measuremean=metric_mean(_bins))
+            
+            new_measure.save()
+            #current_user.add_polarization(new_polarization)
+    
+            return {"success": True,
+                    "polarizationID": new_measure.id,
+                    "msg": "The polarization was successfully registered"}, 201
+            
+
+@rest_api.route('/api/users/polarizationfrank')
+class Measurement(Resource):
+    """
+       creates a new polarization measurement by taking 'data_model' input
+    """
+
+    @rest_api.expect(data_model, validate=True)
+    def post(self):
+    
+            req_data = request.get_json()
+            #current_user = Users.get_by_id(1).id
+            current_user = 1
+            namemeasure = "Frank"
+            _bins = req_data.get("bins")
+            parameters = req_data.get("parameters")
+            _alpha = parameters[0]
+            _beta = parameters[1]
+            
+            _new_polarization =  metric_comete(alpha=_alpha, beta= _beta, weights=_bins)
+            new_measure = Measure(user_id=current_user, measurename=namemeasure, 
+                                  measurement=_new_polarization, measuremedian=metric_median(_bins), 
+                                  measurevar=metric_var(_bins), measuremean=metric_mean(_bins))
+            
+            new_measure.save()
+            #current_user.add_polarization(new_polarization)
+    
+            return {"success": True,
+                    "polarizationID": new_measure.id,
+                    "msg": "The polarization was successfully registered"}, 201
+            
+           
+
 
 
 """
@@ -123,7 +182,7 @@ class Register(Resource):
 
         return {"success": True,
                 "userID": new_user.id,
-                "msg": "The user was successfully registered"}, 200
+                "msg": "The user was successfully registered"}, 201
 
 
 @rest_api.route('/api/users/login')

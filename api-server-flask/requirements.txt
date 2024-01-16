@@ -34,9 +34,10 @@ tomli==2.0.1
 urllib3==1.26.13
 Werkzeug==2.1.2
 zipp==3.11.0
-
+numpy==1.21.2
+flask_migrate
 
 # flask_mysqldb
 psycopg2-binary
-firebase-admin
+
 

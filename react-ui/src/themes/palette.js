@@ -6,7 +6,8 @@ export function themePalette(theme) {
     return {
         mode: theme.customization.navType,
         common: {
-            black: '#000000'
+            black: '#000000',
+            white: '#FFFFFF'
         },
         primary: {
             light: '#7C8EA6',

@@ -20,6 +20,7 @@ class Users(db.Model):
     password = db.Column(db.Text())
     jwt_auth_active = db.Column(db.Boolean())
     date_joined = db.Column(db.DateTime(), default=datetime.utcnow)
+    calculations = db.relationship('PolarizationCalculation', backref='user', lazy=True)
 
     def __repr__(self):
         return f"User {self.username}"
@@ -83,3 +84,30 @@ class JWTTokenBlocklist(db.Model):
     def save(self):
         db.session.add(self)
         db.session.commit()
+
+class PolarizationCalculation(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    bins = db.Column(db.PickleType)
+    parameters = db.Column(db.PickleType)
+    
+class Measure(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    measurename = db.Column(db.String(32), nullable=False)
+    measurement = db.Column(db.Float(), nullable=False)
+    measuremedian = db.Column(db.Float(), nullable=False)
+    measurevar = db.Column(db.Float(), nullable=False)
+    measuremean = db.Column(db.Float(), nullable=False)
+    
+
+    def __repr__(self):
+        return f"Measure {self.id}"
+    
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+  
+
+   

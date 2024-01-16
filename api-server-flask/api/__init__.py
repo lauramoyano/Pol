@@ -7,9 +7,12 @@ import os, json
 
 from flask import Flask
 from flask_cors import CORS
+from flask_migrate import Migrate 
 
 from .routes import rest_api
 from .models import db
+
+
 
 app = Flask(__name__)
 
@@ -24,6 +27,7 @@ CORS(app)
 def initialize_database():
     try:
         db.create_all()
+        
     except Exception as e:
 
         print('> Error: DBMS Exception: ' + str(e) )

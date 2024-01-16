@@ -34,6 +34,7 @@ import { ACCOUNT_INITIALIZE } from './../../../../store/actions';
 // assets
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
+import { useHistory } from 'react-router-dom';
 
 // style constant
 const useStyles = makeStyles((theme) => ({
@@ -79,7 +80,7 @@ const useStyles = makeStyles((theme) => ({
 const RestLogin = (props, { ...others }) => {
     const classes = useStyles();
     const dispatcher = useDispatch();
-
+    const history = useHistory();
     const scriptedRef = useScriptRef();
     const [checked, setChecked] = React.useState(true);
 
@@ -122,6 +123,7 @@ const RestLogin = (props, { ...others }) => {
                                         setStatus({ success: true });
                                         setSubmitting(false);
                                     }
+                                    history.push('/dashboard/default');
                                 } else {
                                     setStatus({ success: false });
                                     setErrors({ submit: response.data.msg });
